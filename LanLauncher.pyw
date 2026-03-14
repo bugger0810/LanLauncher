@@ -6,6 +6,7 @@ def main():
     # sets up argument parser for commandline argument usage
     parser = argparse.ArgumentParser(description='LanLauncher, for when you want to launch plutonium without an active internet connection!')
     parser.add_argument('-name', type=str, help='username that you will use example: "JugAndDoubleTap",  default is the one you set in the GUI', default=None)
+    parser.add_argument('-net_port', type=str, help='client network port, default is the one set in the GUI or 4976', default=None)
     parser.add_argument('-plutoniumdir', type=str, help='location at which your plutonium folder is stored example: "C:/user/(name)/appdata/local/plutonium", by default uses the one that was set in the GUI, Must be used with -nogui', default=None)
     parser.add_argument('-mode', type=str, help='mode selector, either input "MP" or "ZM", MUST be used with -nogui', default="ZM")
     parser.add_argument('-gamedir', type=str, help='location at which your game is stored example: "C:/games/cod world at war", by default uses the one that was set in the GUI, MUST be used with -nogui', default=None)
@@ -29,7 +30,8 @@ def main():
         "MODEID" : 11,
         "NOGUI" : 12,
         "WAWSERVMULT" : 13,
-        "ACTIVEGAME" : 14
+        "ACTIVEGAME" : 14,
+        "NETPORT" : 15
     }
     # initilizes array size based on dictionary, and sets all indexes to '' (empty) to start off
     settings = [''] * len(GENERAL)
@@ -43,6 +45,7 @@ def main():
     settings[GENERAL["VERSIONNUM"]] = "2.0.0"
     # sets default theme
     settings[GENERAL["THEME"]] = "DarkAmber"
+    settings[GENERAL["NETPORT"]] = "4976"
 
 
     if os.path.isfile("LanLauncher.ini"):
@@ -68,6 +71,8 @@ def main():
         # if a name is provided using commandline arguments then this is used
         if args.name != None:
             settings[GENERAL["USERNAME"]] = args.name
+        if args.net_port != None:
+            settings[GENERAL["NETPORT"]] = args.net_port
         match args.gameid.upper():
             case "T4":
                 if args.mode.upper() == "MP":
@@ -118,6 +123,7 @@ def SaveToINI(GENERAL, settings, values):
 
         if not os.path.isfile("LanLauncher.ini"):
             config['LanLauncher'] = {'username': str(values["username"]),
+            'net port': str(values["netport"]),
             'plutonium folder': str(values["plutoniuminstance"]),
             'world at war folder': str(values["waw"]),
             'black ops 1 folder': str(values["bo1"]),
@@ -129,6 +135,7 @@ def SaveToINI(GENERAL, settings, values):
         else:
             config.read('LanLauncher.ini')
             config.set('LanLauncher', 'username', str(values["username"]))
+            config.set('LanLauncher', 'net port', str(values["netport"]))
             config.set('LanLauncher', 'world at war folder', str(values["waw"]))
             config.set('LanLauncher', 'black ops 1 folder', str(values["bo1"]))
             config.set('LanLauncher', 'black ops 2 folder', str(values["bo2"]))
@@ -152,6 +159,11 @@ def LoadFromINI(GENERAL, settings):
         except Exception as e:
             print(e)
             config.set('LanLauncher', 'plutonium folder', settings[GENERAL["PLUTONIUMINSTANCE"]])
+        try:
+            settings[GENERAL["NETPORT"]] = config.get('LanLauncher', 'net port')
+        except Exception as e:
+            print(e)
+            config.set('LanLauncher', 'net port', settings[GENERAL["NETPORT"]])
         try:
             settings[GENERAL["WAW"]] = config.get('LanLauncher', 'world at war folder')
         except Exception as e:

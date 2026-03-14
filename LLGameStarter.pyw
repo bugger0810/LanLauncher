@@ -1,6 +1,18 @@
 import os, subprocess
 import LLWindows as LLW
 
+def GetNetPort(settings, GENERAL):
+    port = str(settings[GENERAL["NETPORT"]]).strip()
+
+    if port == '':
+        return "4976"
+
+    if not port.isdigit():
+        LLW.ErrorWindow(GENERAL, settings, "port")
+        return None
+
+    return port
+
 def Launch(GENERAL, settings, modSelection):
     exePath = "/bin/plutonium-bootstrapper-win32.exe"
 
@@ -12,6 +24,10 @@ def Launch(GENERAL, settings, modSelection):
     if not os.path.exists(settings[GENERAL["PLUTONIUMINSTANCE"]] + exePath):
         LLW.ErrorWindow(GENERAL, settings, "plutonium")
         # cancels launching if the directory for plutonium is invalid
+        return
+
+    netPort = GetNetPort(settings, GENERAL)
+    if netPort is None:
         return
 
     match settings[GENERAL["GAMEID"]]:
@@ -44,7 +60,7 @@ def Launch(GENERAL, settings, modSelection):
                 return
 
     # default launch with no mods selected
-    launchPlutonium = rf'"{settings[GENERAL["PLUTONIUMINSTANCE"]] + exePath}" {settings[GENERAL["MODEID"]]} "{settings[GENERAL["ACTIVEGAME"]]}" +name "{settings[GENERAL["USERNAME"]]}" -lan'
+    launchPlutonium = rf'"{settings[GENERAL["PLUTONIUMINSTANCE"]] + exePath}" {settings[GENERAL["MODEID"]]} "{settings[GENERAL["ACTIVEGAME"]]}" +name "{settings[GENERAL["USERNAME"]]}" -lan +set net_port {netPort}'
 
     if modSelection != '':
         if not settings[GENERAL["GAMEID"]] == settings[GENERAL["MODID"]]:
@@ -54,7 +70,7 @@ def Launch(GENERAL, settings, modSelection):
         else:
             # sets to launch with a mod
             modSelection = fr'"mods/{modSelection}"'
-            launchPlutonium = rf'"{settings[GENERAL["PLUTONIUMINSTANCE"]] + exePath}" {settings[GENERAL["MODEID"]]} "{settings[GENERAL["ACTIVEGAME"]]}" +name "{settings[GENERAL["USERNAME"]]}" -lan +set fs_game {modSelection}'
+            launchPlutonium = rf'"{settings[GENERAL["PLUTONIUMINSTANCE"]] + exePath}" {settings[GENERAL["MODEID"]]} "{settings[GENERAL["ACTIVEGAME"]]}" +name "{settings[GENERAL["USERNAME"]]}" -lan +set net_port {netPort} +set fs_game {modSelection}'
 
     subprocess.Popen(launchPlutonium, cwd=settings[GENERAL["PLUTONIUMINSTANCE"]])
 

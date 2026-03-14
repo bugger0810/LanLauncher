@@ -58,6 +58,8 @@ def MainWindow(GENERAL, settings):
     
     mainTab = [[sg.Text('Username', pad=((0, 0), (0, 0)))],
                 [sg.InputText(settings[GENERAL["USERNAME"]], key='username', pad=((0, 0), (0, 0))), sg.Radio(r"SP/ZM", key='zombies', default=True, group_id='gamemode', pad=((61, 0), (0, 0)))],
+                [sg.Text('Client port', pad=((0, 0), (0, 0)))],
+                [sg.InputText(settings[GENERAL["NETPORT"]], key='netport', pad=((0, 0), (0, 0))), sg.Text('Default: 4976', pad=((24, 0), (0, 0)))],
                 [sg.Text('Plutonium folder (AppData)', pad=((0, 0), (0, 0)))],
                 [sg.InputText(settings[GENERAL["PLUTONIUMINSTANCE"]], key='plutoniuminstance', pad=((0, 0), (0, 0))), sg.FolderBrowse(key='plutoniumfolder'), sg.Radio("MP", key='multiplayer', group_id='gamemode', pad=((0, 0), (0, 0)))],
                 [sg.Text('World at War folder', pad=((0, 0), (0, 0)))],    
@@ -442,6 +444,8 @@ def ErrorWindow(GENERAL, settings, errorType):
             message = 'The folder refers to the location at which your game is installed.\nFor example, if you have it installed to C:/games/pluto_t6_fullgame\nThen that is what you would either type or browse for.'
         case "username":
             message = 'The username you selected is invalid.'
+        case "port":
+            message = 'The client port is invalid. Please enter a numeric port such as 4976.'
         case "T4":
             message = f'The specified folder "{settings[GENERAL["WAW"]]}" \ndoes not contain valid World at War game data.'
         case "T5":
